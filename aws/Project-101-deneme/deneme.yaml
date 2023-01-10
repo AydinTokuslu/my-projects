@@ -25,7 +25,8 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
-  LogicalID:
+
+  WebServerHost:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-0b5eea76982371e91
