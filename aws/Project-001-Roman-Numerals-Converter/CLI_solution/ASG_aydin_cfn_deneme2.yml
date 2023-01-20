@@ -1,0 +1,267 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  This template creates ASG with LT and Policy 
+Parameters:
+  InstanceType:
+    Description: Select your instance type.
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t2.nano
+      - t3.micro
+      - m1.small
+  MyKeyPair:
+    Description: Select your keypair.
+    Type: AWS::EC2::KeyPair::KeyName
+
+  Subnets:
+    Description: Select at least 2 subnetss. 
+    Type: List<AWS::EC2::Subnet::Id>
+  
+  VPC:
+    Description: Select your VPC
+    Type: AWS::EC2::VPC::Id
+      
+Mappings:
+  RegionImageMap:
+    us-east-1:
+      AMI: ami-0b5eea76982371e91
+    us-east-2:
+      AMI: ami-0233c2d874b811deb
+    us-west-1:
+      AMI: ami-0ed05376b59b90e46
+    us-west-2:
+      AMI: ami-0dc8f589abe99f538
+    eu-west-1:
+      AMI: ami-058b1b7fe545997ae
+
+Resources:
+
+  MyAsgPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      # AdjustmentType: "String" # sil
+      AutoScalingGroupName: !Ref MyASG # Required
+      # Cooldown: "String" # sil
+      # EstimatedInstanceWarmup: Number # sil
+      # MetricAggregationType: "String" # sil
+      # MinAdjustmentMagnitude: Number # sil
+      PolicyType: TargetTrackingScaling
+      # PredictiveScalingConfiguration: # sil
+      #   MaxCapacityBreachBehavior: "String" # sil
+      #   MaxCapacityBuffer: Number # sil
+      #   MetricSpecifications: # sil
+      #     -
+      #   Mode: "String" # sil
+      #   SchedulingBufferTime: Number # sil
+      # ScalingAdjustment: Number # sil
+      # StepAdjustments: # sil
+      #   StepAdjustments # sil
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        # DisableScaleIn: Number # sil
+        TargetValue: 60.0
+
+  MyASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      # AutoScalingGroupName: "String" # sil
+      # AvailabilityZones: # sil
+      #   AvailabilityZones # sil
+      # CapacityRebalance: false # sil
+      # Context: "String" # sil
+      # Cooldown: "String" # sil
+      # DefaultInstanceWarmup: Number # sil
+      DesiredCapacity: 2
+      # DesiredCapacityType: "String" # sil
+      HealthCheckGracePeriod: 90
+      HealthCheckType: ELB
+      # InstanceId: "String" # sil
+      # LaunchConfigurationName: "String" # sil
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate
+        # LaunchTemplateName: "String" # sil
+        Version: 1
+      # LifecycleHookSpecificationList: # sil
+      #   LifecycleHookSpecificationList # sil
+      # LoadBalancerNames: # sil, hata verdiği için yazmıyoruz.
+      #   - !GetAtt MyALB.LoadBalancerName # sil
+      # MaxInstanceLifetime: Number # sil
+      MaxSize: 3 # Required
+      # MetricsCollection: # sil
+      #   MetricsCollection # sil
+      MinSize: 2 # Required
+      # MixedInstancesPolicy: # sil
+      # NewInstancesProtectedFromScaleIn: false # sil
+      # NotificationConfigurations: # sil
+      #   NotificationConfigurations # sil
+      # PlacementGroup: "String" # sil
+      # ServiceLinkedRoleARN: "String" # sil
+      # Tags: # sil
+      #   Tags # sil
+      TargetGroupARNs:
+        - !Ref MyTargetGrp
+      # TerminationPolicies: # sil
+      #   TerminationPolicies # sil
+      VPCZoneIdentifier: !Ref Subnets
+
+  MyListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      # AlpnPolicy: # sil
+      #   AlpnPolicy
+      # Certificates: # sil
+      #   Certificates
+      DefaultActions: # Required
+        - Type: forward
+          TargetGroupArn: !Ref MyTargetGrp
+      LoadBalancerArn: !Ref MyALB # Required
+      Port: 80
+      Protocol: HTTP
+      # SslPolicy: "String" # sil
+
+  MyALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      # IpAddressType: "String" # sil
+      # LoadBalancerAttributes: # sil
+      #   LoadBalancerAttributes # sil
+      Name: aydincfnlb
+      # Scheme: "String" # sil
+      SecurityGroups:
+        - !GetAtt MySecGrp.GroupId 
+      # SubnetMappings: # sil
+      #   SubnetMappings # sil
+      Subnets:
+        - !Ref Subnets
+      # Tags: # sil
+      #   Tags # sil
+      Type: application
+
+  MyLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        # BlockDeviceMappings: # sil
+        #   - # sil
+        # DisableApiStop: false # sil
+        # DisableApiTermination: false # sil
+        # EbsOptimized: false # sil
+        # ElasticGpuSpecifications: # sil
+        #   - # sil
+        # ElasticInferenceAccelerators: # sil
+        #   - # sil
+        ImageId: !FindInMap
+          - RegionImageMap
+          - !Ref "AWS::Region"
+          - AMI
+        # InstanceInitiatedShutdownBehavior: "String" # sil
+        InstanceType: !Ref InstanceType
+        # KernelId: "String" # sil
+        KeyName: !Ref MyKeyPair
+        # LicenseSpecifications: # sil
+        #   -
+        # NetworkInterfaces: # sil
+        #   -
+        # RamDiskId: "String" # sil
+        SecurityGroupIds:
+          - !GetAtt MySecGrp.GroupId
+        # SecurityGroups: # sil
+        #   -
+        # TagSpecifications: # sil
+        #   -
+        UserData: !Base64 |
+          #!/bin/bash
+          #update os
+          yum update -y
+          #install apache server
+          yum install -y httpd
+          # get private ip address of ec2 instance using instance metadata
+          TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
+          && PRIVATE_IP=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4`
+          # get public ip address of ec2 instance using instance metadata
+          TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
+          && PUBLIC_IP=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4` 
+          # get date and time of server
+          DATE_TIME=`date`
+          # set all permissions
+          chmod -R 777 /var/www/html
+          # create a custom index.html file
+          echo "<html>
+              <head>
+              <title> Application Load Balancer</title>
+              </head>
+              <body>
+                  <h1>Testing Application Load Balancer</h1>
+                  <h2>Congratulations! You have created an instance from Launch Template</h2>
+                  <h3>This web server is launched from the launch template by YOUR_NAME</h3>
+                  <p>This instance is created at <b>$DATE_TIME</b></p>
+                  <p>Private IP address of this instance is <b>$PRIVATE_IP</b></p>
+                  <p>Public IP address of this instance is <b>$PUBLIC_IP</b></p>
+              </body>
+              </html>" > /var/www/html/index.html
+              # start apache server
+              systemctl start httpd
+              systemctl enable httpd
+      LaunchTemplateName: aydincfnlt
+      # TagSpecifications: # sil
+      #   TagSpecifications # sil
+      # VersionDescription: "String" # sil
+
+  MyTargetGrp:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      #HealthCheckEnabled: false # sil
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      #HealthCheckPort: "String" # sil
+      #HealthCheckProtocol: "String" # sil
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 3
+      #IpAddressType: "String" # sil
+      #Matcher: # sil
+      #  GrpcCode: "String" # sil
+      #  HttpCode: "String" # sil
+      #Name: "String"  # sil
+      Port: 80
+      Protocol: HTTP
+      # ProtocolVersion: "String" # sil
+      # Tags: # sil
+      #   Tags # sil
+      # TargetGroupAttributes: # sil
+      #   TargetGroupAttributes # sil
+      # TargetType: "String" # sil
+      # Targets: # sil
+      #   Targets # sil
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VPC
+
+  MySecGrp:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH and HTTP # Required
+      GroupName: aydincfnsecgrp
+      #SecurityGroupEgress: # sil, outbound
+      #  SecurityGroupEgress # sil
+      SecurityGroupIngress: # security-group-ingress-cidr
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      #Tags: # sil
+      #  Tags # sil
+      VpcId: !Ref VPC
+  
+Outputs:
+  ShowDNS:
+    Description: DNS of ALB
+    Value: !Join
+      - ''
+      - - 'http://'
+        - !GetAtt MyALB.DNSName
