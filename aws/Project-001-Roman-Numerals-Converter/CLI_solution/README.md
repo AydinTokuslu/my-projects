@@ -1,4 +1,4 @@
-WARNING!!!
+WARNING!!!!!
 
 - Ok! First of all, we need to launch an EC2 instance which has Amazon Linux 2 AMI to execute commands in on hand. Because, commands can change based on operating systems. We'll attach security group which allows ssh from anywhere.
 

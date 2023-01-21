@@ -19,10 +19,12 @@ def lcm(num1, num2):  # okek bul
 def index():
     return render_template("index.html", methods=["GET"])
 
-
+#
 # calculate sum of them using "lcm" function, then sent the result to the
 # "result.hmtl" file and assign route of path ('/calc').
 # When the user comes directly "/calc" path, "Since this is a GET request, LCM has not been calculated" string returns to them with "result.html" file
+
+
 @app.route("/calc", methods=["GET", "POST"])
 def calculate():
     if request.method == "POST":
@@ -35,5 +37,5 @@ def calculate():
 
 # Add a statement to run the Flask application which can be debugged.
 if __name__ == "__main__":
-    # app.run(debug=True)
-    app.run(host='0.0.0.0', port=80)
+    app.run(debug=True)
+    #app.run(host='0.0.0.0', port=80)

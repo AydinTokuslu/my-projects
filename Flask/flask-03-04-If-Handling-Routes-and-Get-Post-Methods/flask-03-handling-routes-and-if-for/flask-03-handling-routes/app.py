@@ -19,7 +19,7 @@ def home():
 def about():
     return '<h1>This is my about page </h1>'
 
-
+#
 # Create a function named error which returns a formatted string '<h1>Either you encountered an error or you are not authorized.</h1>'
 # and assign to the static route of ('error')
 @app.route('/error')
@@ -32,7 +32,6 @@ def error():
 @app.route("/admin")
 def admin():
     return redirect(url_for('error'))
-
 
 # Create a function named greet which return formatted inline html string
 # and assign to the dynamic route of ('/<name>')
@@ -55,6 +54,8 @@ def admin():
 # Rewrite a function named greet which uses template file named `greet.html` under `templates` folder
 # and assign to the dynamic route of ('/<name>').
 # Please find a template html file named `greet.html` which takes `name` as parameter under `templates` folder
+
+
 @app.route('/<name>')
 def greet(name):
     return render_template('greet.html', name=name)
@@ -85,5 +86,5 @@ def evens():
 
 # Add a statement to run the Flask application which can be reached from any host on port 80.
 if __name__ == "__main__":
-    # app.run(debug=True)
-    app.run(host='0.0.0.0', port=80)
+    app.run(debug=True)
+    #app.run(host='0.0.0.0', port=80)

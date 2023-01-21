@@ -57,8 +57,8 @@ def convert():
     if request.method == "POST":
         num = request.form.get("number")
         return render_template("result.html", number_decimal=num, number_roman=roman_conv(num), developer_name='AYDIN TOKUSLU')
-    else:
-        return render_template("result.html", developer_name="AYDIN TOKUSLU")
+    # else:
+    #     return render_template("result.html", developer_name="AYDIN TOKUSLU")
 
 
 if __name__ == "__main__":
