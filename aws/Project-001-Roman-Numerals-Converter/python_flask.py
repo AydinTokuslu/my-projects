@@ -25,18 +25,36 @@ def roman_conv(num):
             result += roman_digit * times
 
     return result
-    # return min(common_multiplications)
 
 
-@app.route("/", methods=["GET", "POST"])
-def calculate():
+@app.route("/")
+def index():
+    return render_template("index.html", methods=["GET"])
+
+
+@app.route("/conv", methods=["GET", "POST"])
+def convert():
     if request.method == "POST":
         num = request.form.get("number")
-        # num2 = request.form.get("number2")
-        return render_template("result.html", number_decimal=num, number_roman=result, roman=roman_conv(num))
+        #result = roman_conv(num)
+        return render_template("result.html", number_decimal=num, number_roman=roman_conv(num), roman=roman_conv)
         # return render_template("result.html", number_decimal=num, number_roman=num2, roman=lcm(int(num1), int(num2)), developer_name='AYDINT')
     else:
         return render_template("result.html")
+
+
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         user_name = request.form['username']
+#         password = request.form['password']
+#         if password == 'clarusway':
+#             return render_template('secure.html', user=user_name.title())
+#         else:
+#             return render_template('login.html', user=user_name.title(), control=True)
+#     else:
+#         return render_template('login.html', control=False)
+
 # @app.route('/sum')
 # def number():
 #     var1, var2 = 15210, 38960
@@ -86,8 +104,6 @@ def calculate():
 # calculate sum of them using "lcm" function, then sent the result to the
 # "result.hmtl" file and assign route of path ('/calc').
 # When the user comes directly "/calc" path, "Since this is a GET request, LCM has not been calculated" string returns to them with "result.html" file
-
-
 # Add a statement to run the Flask application which can be debugged.
 if __name__ == "__main__":
     app.run(debug=True)
