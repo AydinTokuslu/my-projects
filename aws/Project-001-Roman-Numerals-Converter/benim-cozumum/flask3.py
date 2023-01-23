@@ -32,7 +32,7 @@ def index():
 #     if request.method == "GET":
 #         return render_template("index.html", methods=["GET"], developer_name='AYDIN TOKUSLU')
 #     else:
-#         return redirect(url_for('error'))
+#         return '<h1>Not Valid! Please enter a number between 1 and 3999, inclusively.</h1>'
 
 
 # @app.route('/warning')
@@ -52,11 +52,21 @@ def index():
 #         return redirect(url_for('error'))
 
 
+# @app.route("/conv", methods=["GET", "POST"])
+# def convert():
+#     if request.method == "POST":
+#         num = request.form.get("number")
+#         return render_template("result.html", number_decimal=num, number_roman=roman_conv(num), developer_name='AYDIN TOKUSLU')
+
+
 @app.route("/conv", methods=["GET", "POST"])
 def convert():
     if request.method == "POST":
         num = request.form.get("number")
-        return render_template("result.html", number_decimal=num, number_roman=roman_conv(num), developer_name='AYDIN TOKUSLU')
+        if int(num) > 1 and int(num) < 3999:
+            return render_template("result.html", number_decimal=num, number_roman=roman_conv(num), developer_name='AYDIN TOKUSLU')
+        else:
+            return '<h1>Not Valid! Please enter a number between 1 and 3999, inclusively.</h1>'
 
 
 if __name__ == "__main__":
