@@ -45,7 +45,7 @@ Resources:
         mkdir templates
         cd templates
         wget https://raw.githubusercontent.com/AydinTokuslu/my-projects/main/aws/Project-001-Roman-Numerals-Converter/templates/index.html
-        wget https://raw.githubusercontent.com/XXXXXXXXXX/my-projects-2/main/aws/projects/Project-001-Roman-Numerals-Converter/templates/result.html
+        wget https://raw.githubusercontent.com/AydinTokuslu/my-projects/main/aws/Project-001-Roman-Numerals-Converter/templates/result.html
         cd ..
         python3 app.py
       Tags:
@@ -53,3 +53,8 @@ Resources:
           Value: !Sub Web Server of ${AWS::StackName} Stack
 
 Outputs:
+  WebsiteURL:
+    Value: !Sub
+      - http://${PublicAddress}
+      - PublicAddress: !GetAtt WebServerHost.PublicDnsName
+    Description: Roman Numerals Converter Application URL
