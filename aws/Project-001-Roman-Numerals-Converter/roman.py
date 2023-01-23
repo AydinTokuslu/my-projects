@@ -7,6 +7,7 @@ def roman(num):
     remainder = num
 
     for i in sorted(roman_map.keys(), reverse=True):# 2
+        print(i)
         if remainder > 0:
             multiplier = i
             roman_digit = roman_map[i]
