@@ -58,7 +58,7 @@ Resources:
           MaxTTL: 31536000
           DefaultTTL: 86400
         ViewerCertificate:
-          AcmCertificateArn: YOUR_ACM_CERTIFICATE_ARN
+          AcmCertificateArn: arn:aws:acm:us-east-1:731967392843:certificate/97260858-0806-416b-8178-e309a902c48f
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2018
         Aliases:
