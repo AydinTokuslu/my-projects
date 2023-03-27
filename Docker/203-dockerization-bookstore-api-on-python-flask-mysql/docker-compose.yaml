@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+    database:
+        container_name: database
+        image: mysql:5.7
+        environment:
+            MYSQL_ROOT_PASSWORD: 123456
+            MYSQL_DATABASE: bookstore_db
+            MYSQL_USER: clarusway
+            MYSQL_PASSWORD: Clarusway_1
+        networks:
+            - clarusnet
+    flask-app:
+        container_name: flask-app
+        build: .
+        #image: ahsinka/bookstore-api:1.0
+        #image: aydintokuslu/bookstore-api:3.0
+        restart: always
+        depends_on:
+            - database
+        ports:
+            - "80:80"
+        networks:
+            - clarusnet
+
+networks:
+    clarusnet:
+        driver: bridge 
+
